@@ -989,6 +989,7 @@ static int cp210x_startup(struct usb_serial *serial)
 	usb_set_serial_data(serial, spriv);
 
 	/* Get the 1-byte part number of the cp210x device */
+
 	usb_control_msg(serial->dev,
 		usb_rcvctrlpipe(serial->dev, 0),
 		CP210X_VENDOR_SPECIFIC,

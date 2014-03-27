@@ -128,6 +128,8 @@ static const struct usb_device_id id_table[] = {
 	{ USB_DEVICE(0x10C4, 0x85F8) }, /* Virtenio Preon32 */
 	{ USB_DEVICE(0x10C4, 0x8664) }, /* AC-Services CAN-IF */
 	{ USB_DEVICE(0x10C4, 0x8665) }, /* AC-Services OBD-IF */
+	{ USB_DEVICE(0x10C4, 0x88A4) }, /* MMB Networks ZigBee USB Device */
+	{ USB_DEVICE(0x10C4, 0x88A5) }, /* Planet Innovation Ingeni ZigBee USB Device */
 	{ USB_DEVICE(0x10C4, 0xEA60) }, /* Silicon Labs factory default */
 	{ USB_DEVICE(0x10C4, 0xEA61) }, /* Silicon Labs factory default */
 	{ USB_DEVICE(0x10C4, 0xEA70) }, /* Silicon Labs factory default */
@@ -162,6 +164,25 @@ static const struct usb_device_id id_table[] = {
 	{ USB_DEVICE(0x1BE3, 0x07A6) }, /* WAGO 750-923 USB Service Cable */
 	{ USB_DEVICE(0x1E29, 0x0102) }, /* Festo CPX-USB */
 	{ USB_DEVICE(0x1E29, 0x0501) }, /* Festo CMSP */
+	{ USB_DEVICE(0x1FB9, 0x0100) }, /* Lake Shore Model 121 Current Source */
+	{ USB_DEVICE(0x1FB9, 0x0200) }, /* Lake Shore Model 218A Temperature Monitor */
+	{ USB_DEVICE(0x1FB9, 0x0201) }, /* Lake Shore Model 219 Temperature Monitor */
+	{ USB_DEVICE(0x1FB9, 0x0202) }, /* Lake Shore Model 233 Temperature Transmitter */
+	{ USB_DEVICE(0x1FB9, 0x0203) }, /* Lake Shore Model 235 Temperature Transmitter */
+	{ USB_DEVICE(0x1FB9, 0x0300) }, /* Lake Shore Model 335 Temperature Controller */
+	{ USB_DEVICE(0x1FB9, 0x0301) }, /* Lake Shore Model 336 Temperature Controller */
+	{ USB_DEVICE(0x1FB9, 0x0302) }, /* Lake Shore Model 350 Temperature Controller */
+	{ USB_DEVICE(0x1FB9, 0x0303) }, /* Lake Shore Model 371 AC Bridge */
+	{ USB_DEVICE(0x1FB9, 0x0400) }, /* Lake Shore Model 411 Handheld Gaussmeter */
+	{ USB_DEVICE(0x1FB9, 0x0401) }, /* Lake Shore Model 425 Gaussmeter */
+	{ USB_DEVICE(0x1FB9, 0x0402) }, /* Lake Shore Model 455A Gaussmeter */
+	{ USB_DEVICE(0x1FB9, 0x0403) }, /* Lake Shore Model 475A Gaussmeter */
+	{ USB_DEVICE(0x1FB9, 0x0404) }, /* Lake Shore Model 465 Three Axis Gaussmeter */
+	{ USB_DEVICE(0x1FB9, 0x0600) }, /* Lake Shore Model 625A Superconducting MPS */
+	{ USB_DEVICE(0x1FB9, 0x0601) }, /* Lake Shore Model 642A Magnet Power Supply */
+	{ USB_DEVICE(0x1FB9, 0x0602) }, /* Lake Shore Model 648 Magnet Power Supply */
+	{ USB_DEVICE(0x1FB9, 0x0700) }, /* Lake Shore Model 737 VSM Controller */
+	{ USB_DEVICE(0x1FB9, 0x0701) }, /* Lake Shore Model 776 Hall Matrix */
 	{ USB_DEVICE(0x3195, 0xF190) }, /* Link Instruments MSO-19 */
 	{ USB_DEVICE(0x3195, 0xF280) }, /* Link Instruments MSO-28 */
 	{ USB_DEVICE(0x3195, 0xF281) }, /* Link Instruments MSO-28 */
@@ -489,88 +510,88 @@ static int cp210x_ioctl(struct tty_struct *tty,
 	struct usb_serial_port *port = tty->driver_data;
 	struct usb_serial *serial = port->serial;
 	struct cp210x_serial_private *spriv = usb_get_serial_data(serial);
-        int result = 0;
-        unsigned int latch_setting = 0;
-        
-        switch (cmd) {
-                
-                case IOCTL_GPIOGET:
-                        if ((spriv->bPartNumber == CP2103_PARTNUM) ||
-                                (spriv->bPartNumber == CP2104_PARTNUM)) {
-                                result = usb_control_msg(port->serial->dev,
-                                                        usb_rcvctrlpipe(port->serial->dev, 0),
-                                                        CP210X_VENDOR_SPECIFIC,
-                                                        REQTYPE_DEVICE_TO_HOST,
-                                                        CP210X_READ_LATCH,
-                                                        spriv->bInterfaceNumber,
-                                                        &latch_setting, 1,
-                                                        USB_CTRL_GET_TIMEOUT);
-                                if (result != 1)
-                                        return -EPROTO;
-                                *(unsigned long *)arg = (unsigned long)latch_setting;
-                                return 0;
-                        } else if (spriv->bPartNumber == CP2105_PARTNUM) {
-                                result = usb_control_msg(port->serial->dev,
-                                                        usb_rcvctrlpipe(port->serial->dev, 0),
-                                                        CP210X_VENDOR_SPECIFIC,
-                                                        REQTYPE_INTERFACE_TO_HOST,
-                                                        CP210X_READ_LATCH,
-                                                        spriv->bInterfaceNumber,
-                                                        &latch_setting, 1,
-                                                        USB_CTRL_GET_TIMEOUT);
-                                if (result != 1)
-                                        return -EPROTO;
-                                *(unsigned long *)arg = (unsigned long)latch_setting;
-                                return 0;
-                        } else {
-                                return -ENOTSUPP;
-                        }
-                        break;
-                                
-                case IOCTL_GPIOSET:
-                        if ((spriv->bPartNumber == CP2103_PARTNUM) ||
-                                (spriv->bPartNumber == CP2104_PARTNUM)) {
-                                latch_setting =
-                                *(unsigned int *)arg & 0x000000FF;
-                                latch_setting |=
-                                (*(unsigned int *)arg & 0x00FF0000) >> 8;
-                                result = usb_control_msg(port->serial->dev,
-                                                        usb_sndctrlpipe(port->serial->dev, 0),
-                                                        CP210X_VENDOR_SPECIFIC,
-                                                        REQTYPE_HOST_TO_DEVICE,
-                                                        CP210X_WRITE_LATCH,
-                                                        latch_setting,
-                                                        NULL, 0,
-                                                        USB_CTRL_SET_TIMEOUT);
-                                if (result != 0)
-                                        return -EPROTO;
-                                return 0;
-                        } else if (spriv->bPartNumber == CP2105_PARTNUM) {
-                                latch_setting =
-                                *(unsigned int *)arg & 0x000000FF;
-                                latch_setting |=
-                                (*(unsigned int *)arg & 0x00FF0000) >> 8;
-                                result = usb_control_msg(port->serial->dev,
-                                                        usb_sndctrlpipe(port->serial->dev, 0),
-                                                        CP210X_VENDOR_SPECIFIC,
-                                                        REQTYPE_HOST_TO_INTERFACE,
-                                                        CP210X_WRITE_LATCH,
-                                                        spriv->bInterfaceNumber,
-                                                        &latch_setting, 2,
-                                                        USB_CTRL_SET_TIMEOUT);
-                                if (result != 2)
-                                        return -EPROTO;
-                                return 0;
-                        } else {
-                                return -ENOTSUPP;
-                        }
-                        break;
-                                
-                default:
-                        break;
-        }
-        
-        return -ENOIOCTLCMD;
+	int result = 0;
+	unsigned int latch_setting = 0;
+
+	switch (cmd) {
+
+	case IOCTL_GPIOGET:
+		if ((spriv->bPartNumber == CP2103_PARTNUM) ||
+			(spriv->bPartNumber == CP2104_PARTNUM)) {
+			result = usb_control_msg(port->serial->dev,
+					usb_rcvctrlpipe(port->serial->dev, 0),
+					CP210X_VENDOR_SPECIFIC,
+					REQTYPE_DEVICE_TO_HOST,
+					CP210X_READ_LATCH,
+					spriv->bInterfaceNumber,
+					&latch_setting, 1,
+					USB_CTRL_GET_TIMEOUT);
+			if (result != 1)
+				return -EPROTO;
+			*(unsigned long *)arg = (unsigned long)latch_setting;
+			return 0;
+		} else if (spriv->bPartNumber == CP2105_PARTNUM) {
+			result = usb_control_msg(port->serial->dev,
+					usb_rcvctrlpipe(port->serial->dev, 0),
+					CP210X_VENDOR_SPECIFIC,
+					REQTYPE_INTERFACE_TO_HOST,
+					CP210X_READ_LATCH,
+					spriv->bInterfaceNumber,
+					&latch_setting, 1,
+					USB_CTRL_GET_TIMEOUT);
+			if (result != 1)
+				return -EPROTO;
+			*(unsigned long *)arg = (unsigned long)latch_setting;
+			return 0;
+		} else {
+			return -ENOTSUPP;
+		}
+		break;
+
+	case IOCTL_GPIOSET:
+		if ((spriv->bPartNumber == CP2103_PARTNUM) ||
+			(spriv->bPartNumber == CP2104_PARTNUM)) {
+			latch_setting =
+				*(unsigned int *)arg & 0x000000FF;
+			latch_setting |=
+				(*(unsigned int *)arg & 0x00FF0000) >> 8;
+			result = usb_control_msg(port->serial->dev,
+					usb_sndctrlpipe(port->serial->dev, 0),
+					CP210X_VENDOR_SPECIFIC,
+					REQTYPE_HOST_TO_DEVICE,
+					CP210X_WRITE_LATCH,
+					latch_setting,
+					NULL, 0,
+					USB_CTRL_SET_TIMEOUT);
+			if (result != 0)
+				return -EPROTO;
+			return 0;
+		} else if (spriv->bPartNumber == CP2105_PARTNUM) {
+			latch_setting =
+				*(unsigned int *)arg & 0x000000FF;
+			latch_setting |=
+				(*(unsigned int *)arg & 0x00FF0000) >> 8;
+			result = usb_control_msg(port->serial->dev,
+					usb_sndctrlpipe(port->serial->dev, 0),
+					CP210X_VENDOR_SPECIFIC,
+					REQTYPE_HOST_TO_INTERFACE,
+					CP210X_WRITE_LATCH,
+					spriv->bInterfaceNumber,
+					&latch_setting, 2,
+					USB_CTRL_SET_TIMEOUT);
+			if (result != 2)
+				return -EPROTO;
+			return 0;
+		} else {
+			return -ENOTSUPP;
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	return -ENOIOCTLCMD;
 }
 
 /*
@@ -588,9 +609,7 @@ static void cp210x_get_termios(struct tty_struct *tty,
 		cp210x_get_termios_port(tty->driver_data,
 			&tty->termios->c_cflag, &baud);
 		tty_encode_baud_rate(tty, baud, baud);
-	}
-
-	else {
+	} else {
 		unsigned int cflag;
 		cflag = 0;
 		cp210x_get_termios_port(port, &cflag, &baud);
@@ -831,21 +850,21 @@ static void cp210x_set_termios(struct tty_struct *tty,
 		bits &= ~BITS_PARITY_MASK;
 		if (cflag & PARENB) {
 			if (cflag & CMSPAR) {
-			    if (cflag & PARODD) {
-				    bits |= BITS_PARITY_MARK;
-				    dbg("%s - parity = MARK", __func__);
-			    } else {
-				    bits |= BITS_PARITY_SPACE;
-				    dbg("%s - parity = SPACE", __func__);
-			    }
+				if (cflag & PARODD) {
+					bits |= BITS_PARITY_MARK;
+					dbg("%s - parity = MARK", __func__);
+				} else {
+					bits |= BITS_PARITY_SPACE;
+					dbg("%s - parity = SPACE", __func__);
+				}
 			} else {
-			    if (cflag & PARODD) {
-				    bits |= BITS_PARITY_ODD;
-				    dbg("%s - parity = ODD", __func__);
-			    } else {
-				    bits |= BITS_PARITY_EVEN;
-				    dbg("%s - parity = EVEN", __func__);
-			    }
+				if (cflag & PARODD) {
+					bits |= BITS_PARITY_ODD;
+					dbg("%s - parity = ODD", __func__);
+				} else {
+					bits |= BITS_PARITY_EVEN;
+					dbg("%s - parity = EVEN", __func__);
+				}
 			}
 		}
 		if (cp210x_set_config(port, CP210X_SET_LINE_CTL, &bits, 2))
@@ -973,7 +992,7 @@ static int cp210x_startup(struct usb_serial *serial)
 {
 	struct usb_host_interface *cur_altsetting;
 	struct cp210x_serial_private *spriv;
-        unsigned int partNum;
+	unsigned int partNum;
 
 	/* cp210x buffers behave strangely unless device is reset */
 	usb_reset_device(serial->dev);
@@ -987,18 +1006,18 @@ static int cp210x_startup(struct usb_serial *serial)
 
 	usb_set_serial_data(serial, spriv);
 
-        /* Get the 1-byte part number of the cp210x device */
-        //cp210x_get_config(serial->port[i], CP210X_VENDOR_SPECIFIC, &partNum, 1);
-        usb_control_msg(serial->dev,
-                        usb_rcvctrlpipe(serial->dev, 0),
-                        CP210X_VENDOR_SPECIFIC,
-                        REQTYPE_DEVICE_TO_HOST,
-                        CP210X_GET_PARTNUM,
-                        spriv->bInterfaceNumber,
-                        &partNum, 1,
-                        USB_CTRL_GET_TIMEOUT);
-        spriv->bPartNumber = partNum & 0xFF;
-        
+	/* Get the 1-byte part number of the cp210x device */
+	//cp210x_get_config(serial->port[i], CP210X_VENDOR_SPECIFIC, &partNum, 1);
+	usb_control_msg(serial->dev,
+		usb_rcvctrlpipe(serial->dev, 0),
+		CP210X_VENDOR_SPECIFIC,
+		REQTYPE_DEVICE_TO_HOST,
+		CP210X_GET_PARTNUM,
+		spriv->bInterfaceNumber,
+		&partNum, 1,
+		USB_CTRL_GET_TIMEOUT);
+	spriv->bPartNumber = partNum & 0xFF;
+
 	return 0;
 }
 
