@@ -10,7 +10,7 @@
 int main()
 {
 	int fd;
-	printf("CP210x Serial Test\n");
+	printf("CP2104 GPIO Test\n");
 	fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY);
 	if (fd == -1)
 	{
@@ -23,16 +23,11 @@ int main()
 
 	ioctl(fd, IOCTL_GPIOGET, &gpio);
 	printf("original gpio = 0x%08X\n",gpio);
-	gpio = ~gpio;
-	gpio = gpio << 8;
-	gpio |= 0x00FF;
-	printf("gpio = 0x%08X\n",gpio);
-	ioctl(fd, IOCTL_GPIOSET, &gpio);
-	ioctl(fd, IOCTL_GPIOGET, &gpio);
-	printf("gpio = 0x%08X\n",gpio);
 
-	for (i = 0; i<= 1000000; i++) {
-		gpio ^= 0xffffffff;
+	for (i = 0; i<= 50000; i++) {
+		gpio = 0x0005000f;
+		ioctl(fd, IOCTL_GPIOSET, &gpio);
+		gpio = 0x000a000f;
 		ioctl(fd, IOCTL_GPIOSET, &gpio);
 	}
 
