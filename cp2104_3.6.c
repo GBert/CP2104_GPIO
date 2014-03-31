@@ -651,8 +651,7 @@ static void cp210x_get_termios_port(struct usb_serial_port *port,
 		cflag |= CS8;
 		break;
 	case BITS_DATA_9:
-		dbg("%s - data bits = 9 (not supported, using 8 data bits)",
-								__func__);
+		dbg("%s - data bits = 9 (not supported, using 8 data bits)", __func__);
 		cflag |= CS8;
 		bits &= ~BITS_DATA_MASK;
 		bits |= BITS_DATA_8;
@@ -835,8 +834,7 @@ static void cp210x_set_termios(struct tty_struct *tty,
 				break;
 		}
 		if (cp210x_set_config(port, CP210X_SET_LINE_CTL, &bits, 2))
-			dbg("Number of data bits requested "
-					"not supported by device");
+			dbg("Number of data bits requested not supported by device");
 	}
 
 	if ((cflag     & (PARENB|PARODD|CMSPAR)) !=
@@ -877,8 +875,7 @@ static void cp210x_set_termios(struct tty_struct *tty,
 			dbg("%s - stop bits = 1", __func__);
 		}
 		if (cp210x_set_config(port, CP210X_SET_LINE_CTL, &bits, 2))
-			dbg("Number of stop bits requested "
-					"not supported by device");
+			dbg("Number of stop bits requested not supported by device");
 	}
 
 	if ((cflag & CRTSCTS) != (old_cflag & CRTSCTS)) {
@@ -1002,7 +999,7 @@ static int cp210x_startup(struct usb_serial *serial)
 	usb_set_serial_data(serial, spriv);
 
 	/* Get the 1-byte part number of the cp210x device */
-	//cp210x_get_config(serial->port[i], CP210X_VENDOR_SPECIFIC, &partNum, 1);
+
 	usb_control_msg(serial->dev,
 		usb_rcvctrlpipe(serial->dev, 0),
 		CP210X_VENDOR_SPECIFIC,
