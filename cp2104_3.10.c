@@ -496,34 +496,34 @@ static int cp210x_ioctl(struct tty_struct *tty,
 {
 	struct usb_serial_port *port = tty->driver_data;
 	struct usb_serial *serial = port->serial;
-	struct cp210x_serial_private *port_priv = usb_get_serial_data(serial);
+	struct cp210x_serial_private *spriv = usb_get_serial_data(serial);
 	int result = 0;
 	unsigned int latch_setting = 0;
 
 	switch (cmd) {
 
 	case IOCTL_GPIOGET:
-		if ((port_priv->bPartNumber == CP2103_PARTNUM) ||
-			(port_priv->bPartNumber == CP2104_PARTNUM)) {
+		if ((spriv->bPartNumber == CP2103_PARTNUM) ||
+			(spriv->bPartNumber == CP2104_PARTNUM)) {
 			result = usb_control_msg(port->serial->dev,
 					usb_rcvctrlpipe(port->serial->dev, 0),
 					CP210X_VENDOR_SPECIFIC,
 					REQTYPE_DEVICE_TO_HOST,
 					CP210X_READ_LATCH,
-					port_priv->bInterfaceNumber,
+					spriv->bInterfaceNumber,
 					&latch_setting, 1,
 					USB_CTRL_GET_TIMEOUT);
 			if (result != 1)
 				return -EPROTO;
 			*(unsigned long *)arg = (unsigned long)latch_setting;
 			return 0;
-		} else if (port_priv->bPartNumber == CP2105_PARTNUM) {
+		} else if (spriv->bPartNumber == CP2105_PARTNUM) {
 			result = usb_control_msg(port->serial->dev,
 					usb_rcvctrlpipe(port->serial->dev, 0),
 					CP210X_VENDOR_SPECIFIC,
 					REQTYPE_INTERFACE_TO_HOST,
 					CP210X_READ_LATCH,
-					port_priv->bInterfaceNumber,
+					spriv->bInterfaceNumber,
 					&latch_setting, 1,
 					USB_CTRL_GET_TIMEOUT);
 			if (result != 1)
@@ -536,8 +536,8 @@ static int cp210x_ioctl(struct tty_struct *tty,
 		break;
 
 	case IOCTL_GPIOSET:
-		if ((port_priv->bPartNumber == CP2103_PARTNUM) ||
-			(port_priv->bPartNumber == CP2104_PARTNUM)) {
+		if ((spriv->bPartNumber == CP2103_PARTNUM) ||
+			(spriv->bPartNumber == CP2104_PARTNUM)) {
 			latch_setting =
 				*(unsigned int *)arg & 0x000000FF;
 			latch_setting |=
@@ -553,7 +553,7 @@ static int cp210x_ioctl(struct tty_struct *tty,
 			if (result != 0)
 				return -EPROTO;
 			return 0;
-		} else if (port_priv->bPartNumber == CP2105_PARTNUM) {
+		} else if (spriv->bPartNumber == CP2105_PARTNUM) {
 			latch_setting =
 				*(unsigned int *)arg & 0x000000FF;
 			latch_setting |=
@@ -563,7 +563,7 @@ static int cp210x_ioctl(struct tty_struct *tty,
 					CP210X_VENDOR_SPECIFIC,
 					REQTYPE_HOST_TO_INTERFACE,
 					CP210X_WRITE_LATCH,
-					port_priv->bInterfaceNumber,
+					spriv->bInterfaceNumber,
 					&latch_setting, 2,
 					USB_CTRL_SET_TIMEOUT);
 			if (result != 2)

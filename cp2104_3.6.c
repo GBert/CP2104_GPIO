@@ -35,10 +35,9 @@
  */
 static int cp210x_open(struct tty_struct *tty, struct usb_serial_port *);
 static void cp210x_close(struct usb_serial_port *);
-static void cp210x_get_termios(struct tty_struct *,
-        struct usb_serial_port *port);
 static int cp210x_ioctl(struct tty_struct *tty,
-        unsigned int cmd, unsigned long arg);
+	unsigned int cmd, unsigned long arg);
+static void cp210x_get_termios(struct tty_struct *, struct usb_serial_port *);
 static void cp210x_get_termios_port(struct usb_serial_port *port,
 	unsigned int *cflagp, unsigned int *baudp);
 static void cp210x_change_speed(struct tty_struct *, struct usb_serial_port *,
@@ -352,9 +351,8 @@ static int cp210x_get_config(struct usb_serial_port *port, u8 request,
 	kfree(buf);
 
 	if (result != size) {
-		dbg("%s - Unable to send config request, "
-				"request=0x%x size=%d result=%d",
-				__func__, request, size, result);
+		dbg("%s - Unable to send config request, " "request=0x%x size=%d result=%d",
+			__func__, request, size, result);
 		if (result > 0)
 			result = -EPROTO;
 
@@ -408,9 +406,8 @@ static int cp210x_set_config(struct usb_serial_port *port, u8 request,
 	kfree(buf);
 
 	if ((size > 2 && result != size) || result < 0) {
-		dbg("%s - Unable to send request, "
-				"request=0x%x size=%d result=%d",
-				__func__, request, size, result);
+		dbg("%s - Unable to send request, " "request=0x%x size=%d result=%d",
+			__func__, request, size, result);
 		if (result > 0)
 			result = -EPROTO;
 
@@ -708,7 +705,6 @@ static void cp210x_get_termios_port(struct usb_serial_port *port,
 		break;
 	case BITS_STOP_1_5:
 		dbg("%s - stop bits = 1.5 (not supported, using 1 stop bit)",
-								__func__);
 		bits &= ~BITS_STOP_MASK;
 		cp210x_set_config(port, CP210X_SET_LINE_CTL, &bits, 2);
 		break;
@@ -718,7 +714,6 @@ static void cp210x_get_termios_port(struct usb_serial_port *port,
 		break;
 	default:
 		dbg("%s - Unknown number of stop bits, using 1 stop bit",
-								__func__);
 		bits &= ~BITS_STOP_MASK;
 		cp210x_set_config(port, CP210X_SET_LINE_CTL, &bits, 2);
 		break;
