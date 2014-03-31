@@ -351,7 +351,7 @@ static int cp210x_get_config(struct usb_serial_port *port, u8 request,
 	kfree(buf);
 
 	if (result != size) {
-		dbg("%s - Unable to send config request, " "request=0x%x size=%d result=%d",
+		dbg("%s - Unable to send config request, request=0x%x size=%d result=%d",
 			__func__, request, size, result);
 		if (result > 0)
 			result = -EPROTO;
@@ -406,7 +406,7 @@ static int cp210x_set_config(struct usb_serial_port *port, u8 request,
 	kfree(buf);
 
 	if ((size > 2 && result != size) || result < 0) {
-		dbg("%s - Unable to send request, " "request=0x%x size=%d result=%d",
+		dbg("%s - Unable to send request, request=0x%x size=%d result=%d",
 			__func__, request, size, result);
 		if (result > 0)
 			result = -EPROTO;
@@ -706,7 +706,7 @@ static void cp210x_get_termios_port(struct usb_serial_port *port,
 		dbg("%s - stop bits = 1", __func__);
 		break;
 	case BITS_STOP_1_5:
-		dbg("%s - stop bits = 1.5 (not supported, using 1 stop bit)",
+		dbg("%s - stop bits = 1.5 (not supported, using 1 stop bit)", __func__);
 		bits &= ~BITS_STOP_MASK;
 		cp210x_set_config(port, CP210X_SET_LINE_CTL, &bits, 2);
 		break;
@@ -715,7 +715,7 @@ static void cp210x_get_termios_port(struct usb_serial_port *port,
 		cflag |= CSTOPB;
 		break;
 	default:
-		dbg("%s - Unknown number of stop bits, using 1 stop bit",
+		dbg("%s - Unknown number of stop bits, using 1 stop bit", __func__);
 		bits &= ~BITS_STOP_MASK;
 		cp210x_set_config(port, CP210X_SET_LINE_CTL, &bits, 2);
 		break;
