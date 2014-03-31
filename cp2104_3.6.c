@@ -526,6 +526,7 @@ static int cp210x_ioctl(struct tty_struct *tty,
 			if (result != 1)
 				return -EPROTO;
 			*(unsigned long *)arg = (unsigned long)latch_setting;
+			dbg("%s - IOCTL_GPIOGET 0x%X", __func__, latch_setting);
 			return 0;
 		} else if (spriv->bPartNumber == CP2105_PARTNUM) {
 			result = usb_control_msg(port->serial->dev,
@@ -539,6 +540,7 @@ static int cp210x_ioctl(struct tty_struct *tty,
 			if (result != 1)
 				return -EPROTO;
 			*(unsigned long *)arg = (unsigned long)latch_setting;
+			dbg("%s - IOCTL_GPIOGET 0x%X", __func__, latch_setting);
 			return 0;
 		} else {
 			return -ENOTSUPP;
@@ -546,6 +548,7 @@ static int cp210x_ioctl(struct tty_struct *tty,
 		break;
 
 	case IOCTL_GPIOSET:
+		dbg("%s - IOCTL_GPIOSET 0x%Xu", __func__, latch_setting);
 		if ((spriv->bPartNumber == CP2103_PARTNUM) ||
 			(spriv->bPartNumber == CP2104_PARTNUM)) {
 			latch_setting =
