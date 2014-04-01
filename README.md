@@ -13,7 +13,7 @@ This is an adaption of the k8048 software from Darron Broad.
 
 <pre><code>
 Breadboard connections for LVP programming with VPP at 3V3
-----------------------------------------------------------
+\----------------------------------------------------------
 
  CP2104                            PICMicro
  ======                            ========
