@@ -1,6 +1,9 @@
 Using GPIOs on CP2104 adapter
 =============================
 This git contains module code to use the GPIOs on cp2104 adapter with Linux.
+
+![alt text](https://lnxpps.de/projects/cp2104/images/cp2104.jpg "cp2104")
+
 It also contains code to programm a PIC MCU.
 
 Howto use the kernel module
@@ -22,7 +25,7 @@ sudo insmod ./cp2104.ko
 
 Using as PIC programmer
 -----------------------
-The original code from http://dev.kewl.org/k8048/Doc/ is able to programm a wide range of PICs 
+The original [k8048 code](http://dev.kewl.org/k8048/Doc/) is able to programm a wide range of PICs 
 in Low Voltage Programming (aka LVP) mode. There is an inplementation using cheap USB to serial
 converters like the CP2102 based boards. But you run ouf of output pins if you have PICs with
 PGM pin. I've modified the original code to use the GPIOs on CP2104 boards which are able to do it.
@@ -52,9 +55,9 @@ Breadboard connections for LVP programming with VPP at 3V3
  GPIO 0----------------------------PGM---4.7K---+
 (1) Not used by all LVP compatible devices.
 ```
-Using
+### Using
 
-Compile and install:
+#### Compile and install:
 ```
 cd k8048_cp2104
 make ; sudo make install
@@ -62,7 +65,7 @@ make ; sudo make install
 cp dotconf/cp2104_gpio ~/.k8048
 ````
 
-Quick Test
+#### Quick Test
 ```
 % time k16 id
 [000000] [PROGRAM]     2000 WORDS (0100 ROWS OF 0020 WORDS)
