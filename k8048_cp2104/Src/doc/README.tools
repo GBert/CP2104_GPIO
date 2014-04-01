@@ -1,0 +1,214 @@
+-------------------------------------------------------------------------------
+
+ Copyright (C) 2005-2014 Darron Broad
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name `Darron Broad' nor the names of any contributors
+    may be used to endorse or promote products derived from this
+    software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+gputils
+=======
+
+$ apt-get install build-essential
+$ cd /usr/src
+$ wget http://downloads.sourceforge.net/project/gputils/gputils/1.2.0/gputils-1.2.0.tar.gz
+$ tar zxvf gputils-1.2.0.tar.gz
+$ cd gputils-1.2.0
+$ ./configure --prefix=/usr/local --disable-html-doc
+$ make
+$ make install
+
+gputils SVN
+===========
+
+$ apt-get install build-essential subversion
+$ cd /usr/src
+$ svn checkout svn://svn.code.sf.net/p/gputils/code/trunk gputils-svn
+$ cd gputils-svn/gputils
+$ ./configure --prefix=/usr/local --disable-html-doc
+$ make
+$ make install
+$ gpasm -v
+gpasm-1.2.0 #1000 (Feb 26 2014)
+
+gputils for Windows
+===================
+
+Install http://sf.net/projects/gputils/files/gputils-win32/1.2.0/gputils-1.2.0.exe/download
+
+When installation ends add gputils to the PATH in the dialog box (default).
+
+sdcc
+====
+
+$ apt-get install bison flex stx-btree-dev libgc-dev libboost-all-dev
+$ cd /usr/src
+$ wget http://downloads.sourceforge.net/project/sdcc/sdcc/3.3.0/sdcc-src-3.3.0.tar.bz2
+$ tar jxvf sdcc-src-3.3.0.tar.bz2
+$ cd sdcc-3.3.0
+$ ./configure --prefix=/usr/local --enable-libgc
+$ make 
+$ make install
+
+sdcc SVN
+========
+
+$ apt-get install bison flex stx-btree-dev libgc-dev libboost-all-dev
+$ cd /usr/src
+$ svn checkout svn://svn.code.sf.net/p/sdcc/code/trunk sdcc-svn
+$ cd sdcc-svn/sdcc
+$ ./configure --prefix=/usr/local --enable-libgc
+$ make 
+$ make install
+$ sdcc -v
+SDCC : mcs51/z80/z180/r2k/r3ka/gbz80/tlcs90/ds390/pic16/pic14/TININative/ds400/hc08/s08/stm8 3.3.2 #8953 (Feb 26 2014) (Linux)
+published under GNU General Public License (GPL)
+
+sdcc for Windows
+================
+
+Install http://sf.net/projects/sdcc/files/sdcc-win32/3.3.0/sdcc-3.3.0-setup.exe/download
+
+When installation ends add sdcc to the PATH in the dialog box (default).
+
+sdcc for the R-PI using a raspbian emulator
+===========================================
+
+It is not possible to build sdcc natively on a raspberry pi model A due to
+memory contraints but we may build it on a high powered machine using an
+emulator.
+
+See: http://superpiadventures.com/2012/07/development-environment/
+
+Install emulator on emulator host machine.
+
+$ apt-get install qemu-user-static
+$ apt-get install debootstrap
+$ mkdir -p /embedded/raspbian/dev
+$ mkdir -p /embedded/raspbian/proc
+$ mkdir -p /embedded/raspbian/sys
+$ qemu-debootstrap --no-check-gpg --arch armhf wheezy /embedded/raspbian http://archive.raspbian.org/raspbian
+
+Enter emulator and initialise.
+
+$ mount -o bind /dev /embedded/raspbian/dev
+$ mount -t proc proc /embedded/raspbian/proc
+$ mount -t sysfs sysfs /embedded/raspbian/sys
+$ setenv QEMU_CPU arm1176
+$ chroot /embedded/raspbian /bin/bash
+$ echo "deb http://archive.raspbian.org/raspbian/ wheezy main contrib non-free rpi" > /etc/apt/sources.list
+$ wget http://archive.raspbian.org/raspbian.public.key -O - | apt-key add -
+$ apt-get update
+$ apt-get install locales
+$ dpkg-reconfigure locales 
+
+First compile gputils and then afterward sdcc without installing.
+
+Now archive the source directories on the emulator and copy them to the
+R-PI target machine.
+
+$ cd /embedded/raspbian/usr/src
+$ tar -zcf gputils-svn.tgz gputils-svn/gputils
+$ tar -zcf sdcc-svn.tgz sdcc-svn/sdcc
+$ scp *-svn.tgz pi@pi:
+
+On the R-PI target machine install gputils and sddc into /usr/local
+
+$ ssh pi@pi
+$ tar zxf gputils-svn.tgz 
+$ tar zxf sdcc-svn.tgz
+$ cd ~/gputils-svn/gputils
+$ sudo make install
+$ cd ~/sdcc-svn/sdcc
+$ sudo make install
+
+XC16 C30/ASM30 for the R-PI using the raspbian emulator
+=======================================================
+
+Fetch microchip X16 C30/ASM30 v1.21 for Linux.
+
+$ wget http://ww1.microchip.com/downloads/en/DeviceDoc/xc16-v1.21-linux-installer.run.tar
+
+Install microchip C30/ASM30 for Linux in /opt/microchip/xc16/v1.21
+
+$ tar xvf xc16-v1.21-linux-installer.run.tar
+$ chmod +x xc16-v1.21-linux-installer.run
+$ ./xc16-v1.21-linux-installer.run
+ 
+Copy microchip C30/ASM30 for Linux to emulator.
+
+$ mkdir -p /embedded/raspbian/opt/microchip/xc16/v1.21/
+$ cd /embedded/raspbian/opt/microchip/xc16/v1.21/
+$ cp -Rp /opt/microchip/xc16/v1.21/* .
+$ rm -Rf ./rollbackBackupDirectory
+
+Copy build scripts for microchip C30/ASM30 for Linux to emulator.
+
+$ rm -Rf /embedded/raspbian/opt/pic30*
+$ rm -Rf /embedded/raspbian/var/tmp/pic30*
+$ cp -Rp $HOME/k8048/Src/tools/pic30 /embedded/raspbian/var/tmp
+
+Fetch source for microchip C30/ASM30 for Linux.
+
+$ cd /embedded/raspbian/var/tmp/pic30
+$ wget http://ww1.microchip.com/downloads/en/DeviceDoc/XC16_v1_21_src.zip
+
+Enter emulator and build C30/ASM30 for raspbian.
+
+$ mount -o bind /dev /embedded/raspbian/dev
+$ mount -t proc proc /embedded/raspbian/proc
+$ mount -t sysfs sysfs /embedded/raspbian/sys
+$ setenv QEMU_CPU arm1176
+$ chroot /embedded/raspbian /bin/bash
+$ cd /var/tmp/pic30
+$ apt-get install unzip libelf-dev libgmp-dev libppl-dev libcloog-ppl-dev libz-dev
+$ ./install
+$ exit
+
+Create C30/ASM30 archive on the build host and copy to the R-PI target machine.
+
+$ cd /embedded/raspbian/opt
+$ tar zcf pic30-tools.tgz pic30-tools
+$ scp pic30-tools.tgz pi@pi:
+
+On the R-PI target machine extract the archive into /opt
+
+$ ssh pi@pi
+$ sudo -s
+$ cd /opt
+$ rm -Rf pic30-tools
+$ tar zxf ~/pic30-tools.tgz
+$ rm -f ~/pic30-tools.tgz
+
+PIC32 for the R-PI using CHIPKIT
+================================
+
+$ cd /opt/
+$ wget http://chipkit.s3.amazonaws.com/compilers/pic32-tools-chipKIT-cxx-master-arm-linux-image.zip
+$ unzip pic32-tools-chipKIT-cxx-master-arm-linux-image.zip

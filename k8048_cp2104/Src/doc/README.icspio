@@ -1,0 +1,119 @@
+-------------------------------------------------------------------------------
+
+ Copyright (C) 2005-2014 Darron Broad
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name `Darron Broad' nor the names of any contributors
+    may be used to endorse or promote products derived from this
+    software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+ VELLEMAN K8048 ICSP I/O
+ -----------------------
+ Performs serial I/O over the Velleman K8048 ICSP PGC clock and PGD data lines.
+ PGC and PGD port and bits are determined by the number of pins else they may
+ be user defined.
+
+ Usage
+ -----
+  #INCLUDE        "device.inc"   ;DEVICE CONFIG
+  #INCLUDE        "const.inc"    ;CONSTANTS
+  #INCLUDE        "macro.inc"    ;MACROS
+  #INCLUDE        "delay.inc"    ;DELAY COUNTERS
+  #INCLUDE        "shadow.inc"   ;SHADOW I/O (ONLY USE IF DEVICE HAS NO LATCH)
+  NPINS           SET     .18    ;18-PIN PDIP
+  #INCLUDE        "icspio.inc"   ;ICSP I/O
+
+ Internal variables are assigned at the current CBLOCK address. It is up to
+ the main source file to ensure that this address is both valid and that
+ there is enough space for allocation.
+
+ Demo
+ ----
+ Set LEDs and read switches in a loop.
+  ktest 5 ARG
+
+ Set LEDs and read switches from the command line.
+  kio CMD ARG
+  Src/etc/led.sh
+  Src/etc/switch.sh
+
+ Functions
+ ---------
+ GETBYTE
+   Fetches a byte from the master (host) and stores it in BUFFER. 
+   Sets W and also sets the carry bit on error (time-out, protocol or
+   parity error).
+
+ SENDBYTE
+   Sends a byte in W to the master (host). 
+   Sets W and also sets the carry bit on a time-out error.
+ 
+ SENDACK
+   Calls SENDBYTE with W=ACK (acknowledge)
+
+ SENDNAK
+   Calls SENDBYTE with W=NAK (negative acknowledge)
+
+ 2 levels of stack are used when calling the routines GETBYTE, SENDBYTE or
+ SENDTERM. On 12-bit word architecture devices do not call any of these
+ routines from within a sub-routine since it will overflow the stack.
+
+ Protocol
+ --------
+ PGD is used for data I/O with even parity and PGC for clock synchronisation.
+ PGC is unidirectional and is only controlled by the master (host), this is the
+ slave. The interface may or not be inverted but this is catered for by the
+ BITRULES inversion logic.
+
+ Data is setup on the master prior to a clock low to high transition and setup
+ on the slave after a clock low to high transition. Data is read after a clock
+ high to low transition on both master and slave.
+
+ Start and stop bits have data held low and high respectively and if invalid
+ then a protocol error is flagged and the transaction terminated without further
+ communication on either end. Parity error causes a similar closure of the
+ session.
+
+ PGC   +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+
+       |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+ ------+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +-------
+ PGD   START DATA  DATA  DATA  DATA  DATA  DATA  DATA  DATA  EVEN  STOP
+ XXXXXXLLLLLL000000111111222222333333444444555555666666777777PPPPPPHHHHHHHHHHH
+       BIT   BIT0  BIT1  BIT2  BIT3  BIT4  BIT5  BIT6  BIT7  PAR.  BIT
+
+ 1 start bit, 8 data bits, even parity and one stop bit. The data line is
+ normally held high since in order to operate bi-directionally data output must
+ be held high in order for data input to operate.
+
+Notes
+-----
+ Arch. Stack level
+ ----  -----------
+ 12    2
+ 14    8
+ 16    31

@@ -1,0 +1,205 @@
+-------------------------------------------------------------------------------
+
+ Copyright (C) 2005-2014 Darron Broad
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name `Darron Broad' nor the names of any contributors
+    may be used to endorse or promote products derived from this
+    software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+Bus Parrot Bus Pirate Setup
+===========================
+
+The Circuit
+-----------
+
+http://dev.kewl.org/k8048/Src/asm/PIC24FJ64GA002/gEDA/busparrot.png
+
+This layout is a work-in-progress and is almost functionally
+the same as the original the difference being the the power section.
+
+This can be solved later but adequate parts are not available for
+testing at this time.
+
+All parts should be available from CPC in the UK including the PICMicro.
+
+k8048 config
+------------
+
+~/.k8048:
+DEVICE=RPI
+SLEEP=1
+BITRULES=0x1700
+VPP=9
+PGM=255
+PGC=10
+PGD=11
+
+These are the configuration options for the k8048 application which
+is used to program the PICMicro.
+
+Detect the PIC24FJ64GA002
+-------------------------
+
+> k24 lvp id
+[000000] [PROGRAM]  5600 WORDS
+[00ABFC] [CONFIG2]  F9DF
+[00ABFE] [CONFIG1]  3F7F
+[8007F0] [APPID]    D3
+[8007F4] [CALIB1]   E97B34
+[8007F6] [CALIB2]   0F0081
+[8007F8] [CALIB3]   FF006F
+[8007FA] [CALIB4]   FF0001
+[8007FC] [CALIB5]   FFFF21
+[8007FE] [CALIB6]   FFF97D
+[FF0000] [DEVID]    0447 FAM:11 DEV:07 PIC24FJ64GA002
+[FF0002] [DEVREV]   3046 MAJOR:1 DOT:6
+Time: 0:00.07s
+
+Program the PIC24FJ64GA002
+--------------------------
+
+> k24 lvp program BPv3-Firmware_v6.3-beta1_r2151__Bootloader_v4.4.hex 
+Total: 18436
+Time: 0:03.97s
+
+Verify the PIC24FJ64GA002
+-------------------------
+
+> k24 lvp verify BPv3-Firmware_v6.3-beta1_r2151__Bootloader_v4.4.hex
+Total: 18436 Pass: 18436 Fail: 0
+Time: 0:04.58s
+
+Install and setup kermit
+------------------------
+
+> apt-get install ckermit
+
+~/.kermrc:
+set modem type none
+set line /dev/ttyAMA0
+set carrier-watch off
+set speed 115200
+set flow none
+connect
+
+Test the Bus Parrot Bus Pirate
+------------------------------
+
+> kermit
+#
+RE
+Bus Pirate v3.a
+Firmware v6.3-beta1 r2151  Bootloader v4.4
+DEVID:0x0447 REVID:0x3046 (24FJ64GA002 B8)
+http://dangerousprototypes.com
+HiZ>
+<CTRL>\Q
+
+<CTRL>\ is the CONTROL key pressed and then backslash entered without releasing control.
+Enter this and afterward enter upper case Q. This will quit kermit and return to the UNIX
+shell.
+
+Bus Parrot Bus Pirate Demo
+==========================
+
+http://dangerousprototypes.com/docs/Bus_Pirate
+
+I2C EEPROM
+----------
+
+http://dev.kewl.org/k8048/Images/busparrot.jpg
+
+http://dangerousprototypes.com/docs/3EEPROM_explorer_board#24AA_I2C_EEPROM
+
+> kermit
+#
+RE
+Bus Pirate v3.a
+Firmware v6.3-beta1 r2151  Bootloader v4.4
+DEVID:0x0447 REVID:0x3046 (24FJ64GA002 B8)
+http://dangerousprototypes.com
+HiZ>m
+1. HiZ
+2. 1-WIRE
+3. UART
+4. I2C
+5. SPI
+6. 2WIRE
+7. 3WIRE
+8. LCD
+x. exit(without change)
+
+(1)>4
+Set speed:
+ 1. ~5KHz
+ 2. ~50KHz
+ 3. ~100KHz
+ 4. ~400KHz
+
+(1)>
+Clutch disengaged!!!
+To finish setup, start up the power supplies with command 'W'
+
+Ready
+I2C>P
+Pull-up resistors ON
+I2C>W
+POWER SUPPLIES ON
+Clutch engaged!!!
+I2C>(0)
+ 0.Macro menu
+ 1.7bit address search
+ 2.I2C sniffer
+I2C>(1)
+Searching I2C address space. Found devices at:
+0xA0(0x50 W) 0xA1(0x50 R) 
+
+I2C>[0b10100000 0 0 3 2 1]
+I2C START BIT
+WRITE: 0xA0 ACK 
+WRITE: 0x00 ACK 
+WRITE: 0x00 ACK 
+WRITE: 0x03 ACK 
+WRITE: 0x02 ACK 
+WRITE: 0x01 ACK 
+I2C STOP BIT
+I2C>[0b10100000 0 0]
+I2C START BIT
+WRITE: 0xA0 ACK 
+WRITE: 0x00 ACK 
+WRITE: 0x00 ACK 
+I2C STOP BIT
+I2C>[0b10100001 r:3]
+I2C START BIT
+WRITE: 0xA1 ACK 
+READ: 0x03  ACK 0x02  ACK 0x01 
+NACK
+I2C STOP BIT
+I2C>
+<CTRL>\Q

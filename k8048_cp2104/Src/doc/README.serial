@@ -1,0 +1,145 @@
+-------------------------------------------------------------------------------
+
+ Copyright (C) 2005-2014 Darron Broad
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name `Darron Broad' nor the names of any contributors
+    may be used to endorse or promote products derived from this
+    software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+The Velleman programmer board has the following serial interface
+characteristics (D-SUB-9):
+
+ D-SUB-9				ICSP
+ -------                                ----
+ OUTPUT
+ 7		RTS -> PGC		5
+ 4		DTR -> PGD		4
+ 3		TX  -> !MCLR/VPP	1
+ INPUT
+ 8              CTS <- PGD		4
+ OTHER
+ 9 <- 3	        RI  <- TX
+
+Although the interface connects to the serial port, it doesn't utilise
+the RS-232 serial protocol and instead I/O is performed with bit banging.
+
+Data output bits are sent through the DTR line and clocked on the falling
+edge of RTS.
+
+The Tx line is utilised to enable the application of the high programming
+voltage on !MCLR/VPP and not for sending data bits.
+
+Data input bits are read from the CTS line using the same clock as for
+output with the data output line taken high for correct circuit operation.
+
+ D-SUB-9
+ ---------
+ 1 2 3 4 5
+  6 7 8 9
+
+ 1:CD
+ 2:Rx
+ 3:Tx
+ 4:DTR
+ 5:GND
+ 6:DSR
+ 7:RTS
+ 8:CTS
+ 9:RI
+
+Flash dump test
+---------------
+
+ttyS (SLEEP=0)
+--------------
+
+> time k14 flash 2048
+...
+0.000u 0.704s 0:01.10 63.6%     0+0k 0+0io 0pf+0w
+
+> time k16 flash 16384
+...
+0.016u 7.816s 0:08.44 92.6%     0+0k 0+0io 0pf+0w
+
+D-SUB-9 voltage levels (PL-2303 USB SERIAL Adapter)
+---------------------------------------------------
+
+> ktest 1 10
+
+TEST MODE 1 [D-SUB-9]                             D-SUB-9
+                                                  -------
+Tx  SET  (+VE) (D-SUB-9 3) [10 seconds] CTS IN: 0 +6.91V
+Tx  CLR  (-VE) (D-SUB-9 3) [10 seconds] CTS IN: 0 -6.45V
+
+DTR SET  (+VE) (D-SUB-9 4) [10 seconds] CTS IN: 0 +6.91V
+DTR CLR  (-VE) (D-SUB-9 4) [10 seconds] CTS IN: 0 -6.45V
+
+RTS SET  (+VE) (D-SUB-9 7) [10 seconds] CTS IN: 0 +6.91V
+RTS CLR  (-VE) (D-SUB-9 7) [10 seconds] CTS IN: 0 -6.45V
+
+TEST DONE
+
+D-SUB-9 RTS 7 (PGC) mark time (Linux AMD64 3800+)
+-------------------------------------------------
+
+ttyS
+----
+
+There was a 1.5us rise time.
+
+> ktest 3 0
+
+ Sleep    : none
+ Time     : 2.39us
+ Reliable : no
+
+> ktest 3 1
+
+ Sleep    : io_usleep(1)
+ Time     : 5.56us
+ Reliable : yes
+
+ttyUSB
+------
+
+Time was dependant upon usb_control_msg() which always took a minimum of 3ms.
+
+For reliable operation a sleep time of 500us is required.
+
+> ktest 3 0
+
+ Sleep    : none
+ Time     : 3ms
+ Reliable : no
+
+> ktest 3 1
+
+ Sleep    : io_usleep(1)
+ Time     : 3ms
+ Reliable : no

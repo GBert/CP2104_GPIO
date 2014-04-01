@@ -1,0 +1,71 @@
+-------------------------------------------------------------------------------
+
+ Copyright (C) 2005-2014 Darron Broad
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ 1. Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+ 
+ 2. Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name `Darron Broad' nor the names of any contributors
+  may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+MIPS32 REGISTERS
+================
+
+NUMBER       REGISTER NAME   USAGE
+------       -------------   -----
+0x00         ZERO            ZERO
+0x01         AT              ASSEMBLER TEMP
+0x02         V0              VALUE 0
+0x03         V1              VALUE 1
+0x04         A0              ARG 0
+0x05         A1              ARG 1
+0x06         A2              ARG 2
+0x07         A3              ARG 3
+0x08         T0              TEMP 0
+0x09         T1              TEMP 1
+0x0A         T2              TEMP 2
+0x0B         T3              TEMP 3
+0x0C         T4              TEMP 4
+0x0D         T5              TEMP 5
+0x0E         T6              TEMP 6
+0x0F         T7              TEMP 7
+0x10         S0              SAVED TEMP 0
+0x11         S1              SAVED TEMP 1
+0x12         S2              SAVED TEMP 2
+0x13         S3              SAVED TEMP 3
+0x14         S4              SAVED TEMP 4
+0x15         S5              SAVED TEMP 5
+0x16         S6              SAVED TEMP 6
+0x17         S7              SAVED TEMP 7
+0x18         T8              TEMP 8
+0x19         T9              TEMP 9
+0x1A         K0              KERNEL 0
+0x1B         K1              KERNEL 1
+0x1C         GP              GLOBAL POINTER
+0x1D         SP              STACK POINTER
+0x1E         FP              FRAME POINTER
+0x1F         RA              RETURN ADDRESS

@@ -1,0 +1,42 @@
+chipKITPi R-PI GPIO header (RPi-Connect)
+-------------------------------------------------------------------------------
+
+		    JP5
+		+---J4---+
+NC		01	02 GPIO0/GPIO2
+GPIO1/GPIO3	03	04 NC
+GPIO4		05	06 GND
+GPIO18		07	08 GPIO17
+GND		09	10 GPIO21/GPIO27
+GPIO23		11	12 GPIO22
+GPIO24		13	14 3V3
+GND		15	16 GPIO10
+GPIO25		17	18 GPIO9
+GPIO8		19	20 GPIO11
+GPIO7		21	22 GND
+		+--------+
+
+chipKITPi I/O headers (Arduino 3V3 compatible)
+-------------------------------------------------------------------------------
+
+						JA1
+						===
+JA4 POWER					NC NC
+=========					G  GND
+RESET						13 D13 SCK
+3V3						12 D12 MISO
+5V0						11 D11 MOSI PWM
+GND						10 D10 SS
+GND						9  D9 PWM
+VIN						8  D8
+
+						JA2
+						===
+JA3 ANALOG					7  D7 AIN1
+==========					6  D6 AIN0 PWM
+A0						5  D5 T1 PWM
+A1						4  D4 T0
+NC						3  D3 INT1 PWM
+NC						2  D2 INT2
+SDA						1  D1 TXD
+SCL						0  D0 RXD

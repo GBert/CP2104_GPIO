@@ -1,0 +1,182 @@
+-------------------------------------------------------------------------------
+
+ Copyright (C) 2005-2014 Darron Broad
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name `Darron Broad' nor the names of any contributors
+    may be used to endorse or promote products derived from this
+    software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+Breadboard connections for LVP programming with VPP at 3V3
+----------------------------------------------------------
+
+ R-PI                              PICMicro     GPIO header
+ ====                              ========     ===========
+
+ 3V3-------------------------------VDD----+     PIN 1 (P1-01)
+                                          | 
+ GND-------------------------------VSS    |     PIN 6
+                                          1
+ GPIO04-----------470R-------------VPP    0     PIN 7
+                                          K
+ GPIO25-----------470R-------------PGC    |     PIN 22
+                                          |
+ GPIO24-----------470R-------------PGD----+     PIN 18
+
+ GPIO22-----------470R-------------PGM (1)      PIN 15
+
+(1) Not used by all LVP compatible devices.
+
+How to build gpio bit-bang kernel module for raspbian on the R-PI
+=================================================================
+
+Determine the running kernel and it's config on the Raspberry Pi target machine.
+
+$ uname -a
+Linux pi3 3.10.25+ #622 PREEMPT Fri Jan 3 18:41:00 GMT 2014 armv6l GNU/Linux
+$ zgrep "* firmware as of" /usr/share/doc/raspberrypi-bootloader/changelog.Debian.gz | head -1 | awk '{ print $5 }'
+030082b403b
+$ zcat /proc/config.gz > 030082b403b.config
+
+Linux pi3 3.6.11+ #538 PREEMPT Fri Aug 30 20:42:08 BST 2013 armv6l GNU/Linux  d4f5315cfac4e
+Linux pi3 3.10.23+ #608 PREEMPT Mon Dec 9 21:11:23 GMT 2013 armv6l GNU/Linux  9d34d0475f9
+Linux pi3 3.10.24+ #614 PREEMPT Thu Dec 19 20:38:42 GMT 2013 armv6l GNU/Linux c32bc633039cd9
+Linux pi3 3.10.25+ #622 PREEMPT Fri Jan 3 18:41:00 GMT 2014 armv6l GNU/Linux  030082b403b
+
+Determine the kernel hash for this firmware.
+
+$ wget -q https://raw.github.com/raspberrypi/firmware/030082b403b/extra/git_hash -O /tmp/hash
+$ cat /tmp/hash 
+16eb921a96db3dc3555a65b53b99c15753e6b770
+
+3.6.11+  d4f5315cfac4e  1587f775d0a3c437485262ba951afc5e30be69fa
+3.10.23+ 9d34d0475f9    c15430e6a01e1332032d83f6484a866504e8ee97
+3.10.24+ c32bc633039cd9 4bbea92eae6c0792e85a4ba079d367ac6aa77fb5
+3.10.25+ 030082b403b    16eb921a96db3dc3555a65b53b99c15753e6b770
+
+On the build host fetch the kernel build tools.
+
+$ mkdir -p /embedded/raspbian/build/
+$ cd /embedded/raspbian/build/
+$ git clone git://github.com/raspberrypi/tools.git
+
+Then fetch the kernel source for the previously determined hash.
+
+$ cd /embedded/raspbian/build/
+$ rm -Rf /embedded/raspbian/build/linux
+$ git clone https://github.com/raspberrypi/linux.git
+$ cd /embedded/raspbian/build/linux/
+$ git checkout 16eb921a96db3dc3555a65b53b99c15753e6b770
+$ git reset --hard
+
+Prepare to build kernel and copy over configuration.
+
+$ make ARCH=arm mrproper
+$ scp pi@pi:030082b403b.config .config
+
+Build the kernel using the cross compiler tools.
+
+$ make ARCH=arm oldconfig
+$ make ARCH=arm CROSS_COMPILE=/embedded/raspbian/build/tools/arm-bcm2708/arm-bcm2708hardfp-linux-gnueabi/bin/arm-bcm2708hardfp-linux-gnueabi- -j 8
+
+Build the gpio bit-bang module from the k8048 build directory and copy to target machine.
+
+$ cd $HOME/k8048/Src/gpio-bb/
+$ make 
+$ find . -name "*.ko" -exec scp {} pi@pi: \;
+
+Install the module on the Raspberry Pi target machine (Eg. 3.6.11+).
+
+$ mkdir -p /lib/modules/3.6.11+/kernel/local/
+$ cp gpio-bb.ko /lib/modules/3.6.11+/kernel/local/
+$ chown -R 0:0 /lib/modules/3.6.11+/kernel/local/
+$ depmod -a
+
+Load modules on target machine.
+
+/etc/modprobe.d/modprobe.conf:
+install gpio-bb modprobe --ignore-install gpio-bb && modprobe gpio-bb && mknod /dev/gpio-bb c 180 0
+
+$ modprobe gpio-bb
+
+How to build gpio bit-bang kernel modules for OpenWRT 
+=====================================================
+
+This example builds the firmware for a TP-LINK TL-WR941ND V3.2 (UNTESTED)
+
+$ mkdir -p /embedded/openwrt/
+$ cd /embedded/openwrt/
+$ git clone git://git.openwrt.org/openwrt.git openwrt.git
+$ chown -R nobody:nogroup /embedded/openwrt/openwrt.git
+$ cd /embedded/openwrt/openwrt.git
+$ /bin/su nobody
+$ cp feeds.conf.default feeds.conf.default.orig
+$ echo "src-git openwrtfiles git://github.com/GBert/openwrt-files" >> feeds.conf.default
+$ ./scripts/feeds update -a
+$ ./scripts/feeds install kmod-bit-bang-gpio picprog-new
+$ make menuconfig
+ [Target System  = Atheros AR7xxx/AR9xxx]
+ [Target Profile = TP-LINK TL-WR941N/ND]
+ [Kernel Modules] [Other Modules] [kmod-bit-bang-gpio]
+ [Utilities] [picprog-new]
+ [Exit] [Yes]
+$ make V=s
+ [WAIT FOR A LONG TIME...]
+$ ls -1 bin/ar71xx/openwrt-ar71xx-generic-tl-wr941nd-v*factory.bin
+bin/ar71xx/openwrt-ar71xx-generic-tl-wr941nd-v2-squashfs-factory.bin
+bin/ar71xx/openwrt-ar71xx-generic-tl-wr941nd-v3-squashfs-factory.bin
+bin/ar71xx/openwrt-ar71xx-generic-tl-wr941nd-v4-squashfs-factory.bin
+bin/ar71xx/openwrt-ar71xx-generic-tl-wr941nd-v6-squashfs-factory.bin
+ [UPGRADE FIRMWARE]
+$ telnet 192.168.1.1
+Trying 192.168.1.1...
+Connected to 192.168.1.1.
+Escape character is '^]'.
+ === IMPORTANT ============================
+  Use 'passwd' to set your login password
+  this will disable telnet and enable SSH
+ ------------------------------------------
+
+
+BusyBox v1.19.4 (2014-03-17 16:43:34 GMT) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+  _______                     ________        __
+ |       |.-----.-----.-----.|  |  |  |.----.|  |_
+ |   -   ||  _  |  -__|     ||  |  |  ||   _||   _|
+ |_______||   __|_____|__|__||________||__|  |____|
+          |__| W I R E L E S S   F R E E D O M
+ -----------------------------------------------------
+ BARRIER BREAKER (Bleeding Edge, r39935)
+ -----------------------------------------------------
+  * 1/2 oz Galliano         Pour all ingredients into
+  * 4 oz cold Coffee        an irish coffee mug filled
+  * 1 1/2 oz Dark Rum       with crushed ice. Stir.
+  * 2 tsp. Creme de Cacao
+ -----------------------------------------------------
+root@OpenWrt:/# 

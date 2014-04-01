@@ -1,0 +1,80 @@
+-------------------------------------------------------------------------------
+
+ Copyright (C) 2005-2014 Darron Broad
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name `Darron Broad' nor the names of any contributors
+    may be used to endorse or promote products derived from this
+    software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+PIC18F2550
+==========
+
+PINOUT
+------
+!MCLR VPP RE3            1-----28 RB7 KBI3 PGD
+RA0 AN0                  2     27 RB6 KBI2 PGC
+RA1 AN1                  3     26 RB5 KBI1 PGM
+RA2 AN2 VREF- CVREF      4     25 RB4 KBI0 AN11
+RA3 AN3 VREF+            5     24 RB3 AN9  CCP2 VPO
+RA4 T0CKI C1OUT RCV      6     23 RB2 AN8  INT2 VMO
+RA5 AN4 !SS HLVDIN C2OUT 7     22 RB1 AN10 INT1 SCK SCL
+VSS GND                  8     21 RB0 AN12 INT0 FLT0 SDI SDA
+OSC1 CLKI                9     20 VDD VCC
+OSC2 CLKO RA6            10    19 VSS GND
+RC0 T1OSO T13CKI         11    18 RC7 RX DT SDO
+RC1 T1OSI CCP2 !UOE      12    17 RC6 TX CK
+RC2 CCP1                 13    16 RC5 D+ VP
+VUSB                     14----15 RC4 D- VM
+
+J9 ICSP		PIC18F2550		J6		PIC18F2550
+-------		----------		---		----------
+1:VPP		!MCLR VPP RE3		10:RB1/SCL/SCK	RB1 AN10 INT1 SCK SCL
+2:VDD 5V	VPIC			 9:RB0/SDA/SDI	RB0 AN12 INT0 FLT0 SDI SDA
+3:VSS/GND	GND			 8:RA3/VREF	RA3 AN3 VREF+
+4:PGD		RB7 KBI3 PGD		 7:GND		GND
+5:PGC		RB6 KDI2 PGC		 6:RB1/SCL/SCK	RB1 AN10 INT1 SCK SCL
+6:NC					 5:RC7/RXD/SDO	RC7 RX DT SDO
+					 4:RB0/SDA/SDI	RB0 AN12 INT0 FLT0 SDI SDA
+J5 POWER				 3:RA5/TXD/SS	RA5 AN4 !SS HLVDIN C2OUT
+--------				 2:RC1		RC1 T1OSI CCP2 !UOE
+1:RST		!MCLR VPP RE3		 1:RC0		RC0 T1OSO T13CKI
+2:3V3		+3V3
+3:5V		+5V			J4
+4:GND		GND			---
+5:GND		GND			 8:RB7		RB7 KBI3 PGD
+6:VIN		VIN			 7:RB6		RB6 KBI2 PGC
+					 6:RB5		RB5 KBI1 PGM
+J3 ANALOGUE				 5:RC2		RC2 CCP1
+-----------				 4:RC4/D-	RC4 D- VM
+1:RA0/AN0	RA0 AN0			 3:RC5/D+	RC5 D+ VP
+2:RA1/AN1	RA1 AN1			 2:RC6/TXD	RC6 TX CK
+3:RA2/AN2	RA2 AN2  VREF- CVREF	 1:RC7/RXD/SDO	RC7 RX DT SDO
+4:RB2/AN3	RB2 AN8  INT2  VMO
+5:RB3/AN4	RB3 AN9  CCP2  VPO
+6:RB4/AN5	RB4 KBI0 AN11

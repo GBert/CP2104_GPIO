@@ -1,0 +1,240 @@
+-------------------------------------------------------------------------------
+
+ Copyright (C) 2005-2014 Darron Broad
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name `Darron Broad' nor the names of any contributors
+    may be used to endorse or promote products derived from this
+    software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+Velleman K8048 implementation
+-----------------------------
+
+ TX/!MCLR/VPP     <- GPIO14
+ RTS/PGC CLOCK    <- GPIO15
+ DTR/PGD DATA_OUT <- GPIO23
+ RTS/PGD DATA_IN  -> GPIO24
+
+In development 12V D.C. was applied to a number of R-PI GPIO pins in error.
+DON'T DO THIS. They all died. The default pins chosen here represent those
+which are still working for me and may not be optimal nor your preference.
+You can change the pins to any you like in your .k8048 profile.
+
+R-PI GPIO header
+----------------
+
+                +---P1---+
+3V3             01      02 5V
+GPIO0/GPIO2     03      04 5V
+GPIO1/GPIO3     05      06 GND
+GPIO4           07      08 GPIO14/TX
+GND             09      10 GPIO15/RX
+GPIO17          11      12 GPIO18
+GPIO21/GPIO27   13      14 GND
+GPIO22          15      16 GPIO23
+3V3             17      18 GPIO24
+GPIO10          19      20 GND
+GPIO9           21      22 GPIO25
+GPIO11          23      24 GPIO8
+GND             25      26 GPIO7
+                +--------+
+
+Velleman K8048 Raspberry Pi interface circuit schematic
+-------------------------------------------------------
+
+I.C. 74HC03 QUAD TWO INPUT NAND GATE O/D
+
+The three outputs drive three of four inverting NAND O/D gates.
+The single input drives the fourth remaining gate.
+
+ +5V----+-------+--------------------------------------------Vcc
+        |       |
+       === 1u  === 100n
+        |       |
+ GND----+-------+----------------------------------GND D-SUB-9 5
+
+                |--\           +----2K2---Vcc
+ GPIO14(X)---+--|   \          |
+             |  |    |O--------+----------TX/!MCLR/VPP D-SUB-9 3
+             +--|   /
+                |--/
+
+                |--\           +----2K2---Vcc
+ GPIO15(X)---+--|   \          |
+             |  |    |O--------+---------RTS/PGC CLOCK D-SUB-9 7
+             +--|   /
+                |--/
+
+                |--\           +----2K2---Vcc
+ GPIO23------+--|   \          |
+             |  |    |O--------+------DTR/PGD DATA_OUT D-SUB-9 4
+             +--|   /
+                |--/
+                          +----1M(+)----GND
+                /--|      |
+               /   |--+---+----4K7(*)--CTS/PGD DATA_IN D-SUB-9 8
+ GPIO24------O|    |  |  _|_
+               \   |--+  /_\ 5V1 ZENER(*)
+                \--|      |
+                         GND
+
+(X) When using either GPIO14 or GPIO15 kernel logging and a serial
+    console process must be deactivated on these pins which double
+    up as a UART.
+
+    sudo bash
+    cp /etc/inittab /etc/inittab.dist
+    sed -i 's/T0:23:respawn:/#T0:23:respawn:/g' /etc/inittab
+
+    cp /boot/cmdline.txt /boot/cmdline.txt.dist
+    echo "dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 \
+    rootfstype=ext4 elevator=deadline rootwait" > /boot/cmdline.txt
+    sync
+    reboot
+
+(+) To stop stray noise pickup when the Velleman K8048 is disconnected.
+    This is not required for normal and connected operation.
+
+(*) Velleman K8076 or compatible serial device only (untested). These are
+    not required for operation with the Velleman K8048.
+    The I/O BITRULES for the Velleman K8076 are the inverse of those for the
+    Velleman K8048; update the .k8048 profile accordingly.
+
+Breadboard connections for LVP programming with VPP at 3V3
+----------------------------------------------------------
+
+ R-PI                              PICMicro           GPIO header     .k8048
+ ====                              ========           ===========     ======
+
+ 3V3-------------------------------VDD--+---+---+     PIN 1 (P1-01)
+                                        |   |   |
+ GND-------------------------------VSS  R1  R2  R3    PIN 6
+                                        |   |   |
+ GPIO04--------R5-470R-------------VPP--+   |   |     PIN 7           VPP=4
+                                            |   |
+ GPIO25--------R6-470R-------------PGC------+   |     PIN 22          PGC=25
+                                                |
+ GPIO24--------R7-470R-------------PGD----------+     PIN 18          PGD=24
+
+ GPIO22--------R8-470R-------------PGM-----R4---+     PIN 15          PGM=22
+                                                |
+                                               ///
+(R1) 10K !MCLR pull-up
+(R2, R3) 10K~1M for ICSP I/O 
+(R4) 10K where appropriate (PGM is not present on all devices).
+(R5..R8) 470R.
+
+The R-PI GPIO header is described here:
+ http://elinux.org/RPi_Low-level_peripherals#General_Purpose_Input.2FOutput_.28GPIO.29
+
+EEPROM dump test
+----------------
+
+Linux (R-PI) MCP23017
+---------------------
+> time k16 e
+[F00000] 50 49 43 31 38 46 31 33 32 30 00 00 FF FF FF FF PIC18F1320......
+0.250u 5.180s 0:09.84 55.1%     0+0k 0+0io 0pf+0w
+
+Raspberry Pi GPIO
+-----------------
+> time k16 e
+[F00000] 50 49 43 31 38 46 31 33 32 30 00 00 FF FF FF FF PIC18F1320......
+0.100u 0.140s 0:00.40 60.0%     0+0k 0+0io 0pf+0w
+
+Flash dump test
+---------------
+
+> time k12 select 16f505 flash 1024
+...
+0.180u 0.530s 0:01.33 53.3%     0+0k 0+0io 0pf+0w
+
+> time k14 flash 2048
+...
+0.480u 0.970s 0:02.08 69.7%     0+0k 0+0io 0pf+0w
+
+> time k14 flash 4096
+...
+0.710u 2.170s 0:03.53 81.5%     0+0k 0+0io 0pf+0w
+
+> time k14 flash 8192
+...
+1.500u 4.080s 0:06.27 88.9%     0+0k 0+0io 0pf+0w
+
+> time k16 flash 16384
+...
+4.040u 11.830s 0:16.69 95.0%    0+0k 0+0io 0pf+0w
+
+D-SUB-9 voltage levels (RPI GPIO 74HC03)
+----------------------------------------
+
+> ktest 1 10
+
+TEST MODE 1 [D-SUB-9]                             GPIO 74HC03 O/P
+                                                  ---- ----------
+Tx  SET  (+VE) (D-SUB-9 3) [10 seconds] CTS IN: 1 1    +0.07V
+Tx  CLR  (-VE) (D-SUB-9 3) [10 seconds] CTS IN: 1 0    +4.64V
+
+DTR SET  (+VE) (D-SUB-9 4) [10 seconds] CTS IN: 0 1    +0.07V
+DTR CLR  (-VE) (D-SUB-9 4) [10 seconds] CTS IN: 1 0    +4.64V
+
+RTS SET  (+VE) (D-SUB-9 7) [10 seconds] CTS IN: 0 1    +0.07V
+RTS CLR  (-VE) (D-SUB-9 7) [10 seconds] CTS IN: 1 0    +4.64V
+
+TEST DONE
+
+Pins
+----
+
+Release 1
+ 0, 1, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 21, 22, 23, 24, 25
+
+Release 2
+ 2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 22, 23, 24, 25, 27
+
+I/O Memory
+---------
+
+00000000-1effffff : System RAM
+  00008000-004c0e77 : Kernel text
+  004e2000-005b5127 : Kernel data
+20000000-20000fff : bcm2708_vcio
+20003000-20003fff : bcm2708_systemtimer
+20007000-20007fff : bcm2708_dma.0
+  20007000-20007fff : bcm2708_dma
+20100000-201000ff : bcm2708_powerman.0
+20200000-20200fff : bcm2708_gpio
+20201000-20201fff : dev:f1
+  20201000-20201fff : uart-pl011
+20204000-202040ff : bcm2708_spi.0
+20205000-202050ff : bcm2708_i2c.0
+20300000-203000ff : bcm2708_sdhci.0
+  20300000-203000ff : mmc0
+20804000-208040ff : bcm2708_i2c.1
+20980000-2099ffff : bcm2708_usb
+  20980000-2099ffff : dwc_otg

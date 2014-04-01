@@ -1,0 +1,94 @@
+#
+# Copyright (C) 2005-2014 Darron Broad
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# 3. Neither the name `Darron Broad' nor the names of any contributors
+#    may be used to endorse or promote products derived from this
+#    software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+
+#
+# Copy this file to ~/.k8048
+#
+
+# I/O device: tty
+#
+DEVICE=/dev/ttyUSB0
+
+# For ttyS 1us is fine
+# For ttyUSB try 600us
+#
+# When SLEEP is set to zero no delay is taken
+# When SLEEP is less than 10, then SLEEP x I/O bit time is taken for R-PI and tty
+# When SLEEP is less than 100 a busy loop is utilised
+# When SLEEP is >=100 then system usleep is used.
+#
+# For GPIO BIT-BANG SLEEP configures the low and high clock durations in the driver
+#
+# cuau0/ttyS
+#SLEEP=1
+# ttyUSB
+SLEEP=0
+
+# I/O bit rules.
+#       These rules determine the polarity of the control lines and whether
+#       data input requires data output pulled high.
+# 0x0001 PGD_OUT_FLIP
+# 0x0002 PGC_OUT_FLIP
+# 0x0004 VPP_OUT_FLIP
+# 0x0008 PGD_IN_FLIP
+# 0x0010 PGD_IN_PULLUP
+# 0x0020 PGM_OUT_FLIP
+#       These rules are for GPIOs on program exit.
+# 0x0100 PGD_RELEASE
+# 0x0200 PGC_RELEASE
+# 0x0400 PGM_RELEASE
+# 0x0800 VPP_RELEASE
+# 0x1000 VPP_RUN
+#       This rule enables shift with irq lock for GPIO BIT-BANG
+# 0x2000 BB_LOCK
+#
+BITRULES=0x0010
+
+# I/O busy cursor (0=DISABLED)
+# 
+BUSY=1
+
+# CP2104 GPOI Ports are fixed - only for record here
+# !MCLR/VPP
+VPP=1
+# PGM Programming
+PGM=0
+# PGC CLOCK
+PGC=2
+# PGD Data
+PGD=3
+
+# ICSP I/O per half-bit sleep time for `kio'.
+FWSLEEP=30
+
+# Debug level (0=NONE, 1=ERROR, 10=INFO)
+DEBUG=1

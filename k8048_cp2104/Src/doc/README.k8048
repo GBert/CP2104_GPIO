@@ -1,0 +1,116 @@
+-------------------------------------------------------------------------------
+
+ Copyright (C) 2005-2014 Darron Broad
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name `Darron Broad' nor the names of any contributors
+    may be used to endorse or promote products derived from this
+    software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+SOCKET CROSS REFERENCE
+-------------------------------------------------------------------------------
+
+ Socket    8-pin     14-pin    18-pin    28-pin
+ --------- --------- --------- --------- ---------
+ Function  Pin
+ --------- ---
+ LD1       GP2 (5)   RC0 (10)  RB0 (6)   RA0 (2)
+ LD2       GP4 (3)   RC1 (9)   RB1 (7)   RA1 (3)
+ LD3                 RC2 (8)   RB2 (8)   RA2 (4)
+ LD4                 RC3 (7)   RB3 (9)   RA3 (5)
+ LD5                 RC4 (6)   RB4 (10)  RA4 (6)
+ LD6                           RB5 (11)  RA5 (7)
+
+ SW1       GP5 (2)   RC5 (5)   RA0 (17)  RB0 (21)
+ SW2                 RA2 (11)  RA1 (18)  RB1 (22)
+ SW3                           RA2 (1)   RB2 (23)
+ SW4                           RA3 (2)   RB4 (25)
+
+ PGD       GP0 (7)   RA0 (13)  RB7 (13)  RB7 (28)
+ PGC       GP1 (6)   RA1 (12)  RB6 (12)  RB6 (27)
+ VPP       GP3 (4)   RA3 (4)   RA5 (4)   VPP (1)
+ PGM/24                                  RB3 (24)
+ PGM/26                                  RB5 (26)
+
+ OSC1                RA5 (2)   RA7 (16)  RA7 (9)
+ OSC2                RA4 (3)   RA6 (15)  RA6 (10)
+
+ VDD/VCC   VDD (1)   VDD (1)   VDD (14)  VDD (20)
+ VSS/GND   VSS (8)   VSS (14)  VSS (5)   VSS (8, 19)
+
+ NC                            RA4 (3)
+ NC                                      RC0 (11)
+ NC                                      RC1 (12)
+ NC                                      RC2 (13)
+ NC                                      RC3 (14)
+ NC                                      RC4 (15)
+ NC                                      RC5 (16)
+ NC                                      RC6 (17)
+ NC                                      RC7 (18)
+
+ICSP (In-Circuit Serial Programming)
+-------------------------------------------------------------------------------
+
+ SK3 is an ICSP port, the pins are arranged as follows:
+
+ ICSP
+ ---------
+ 5 4 3 2 1
+
+ 1:VPP 12V
+ 2:VDD 5V
+ 3:VSS/GND
+ 4:PGD
+ 5:PGC
+
+ ICSP voltage levels (No chip installed, no D-SUB-9 connection)
+ --------------------------------------------------------------
+
+ Switch set to RUN.
+
+ 1:VPP		5V
+ 2:VDD		5V
+ 3:VSS/GND	0V
+ 4:PGD		5V
+ 5:PGC		5V
+
+ Switch set to STANDBY.
+
+ 1:VPP		0V
+ 2:VDD		0V
+ 3:VSS/GND	0V
+ 4:PGD		5V
+ 5:PGC		5V
+
+ Switch set to PROG.
+
+ 1:VPP		12V
+ 2:VDD		5V
+ 3:VSS/GND	0V
+ 4:PGD		5V
+ 5:PGC		5V

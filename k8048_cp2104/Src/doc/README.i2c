@@ -1,0 +1,86 @@
+-------------------------------------------------------------------------------
+
+ Copyright (C) 2005-2014 Darron Broad
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name `Darron Broad' nor the names of any contributors
+    may be used to endorse or promote products derived from this
+    software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+Linux (R-PI) I2C (MCP23017)
+---------------------------
+
+R-PI I2C
+--------
+
+Enable I2C on the R-PI as root.
+
+ $ sed -i 's/^blacklist/#blacklist/g' /etc/modprobe.d/raspi-blacklist.conf
+ $ echo 'SUBSYSTEM=="i2c-dev", MODE="0666"' >> /etc/udev/rules.d/10-local.rules
+ $ echo "options i2c_bcm2708 baudrate=400000" >> /etc/modprobe.d/modprobe.conf
+ $ echo 'i2c-dev' >> /etc/modules
+ $ reboot
+
+For the MCP23017 a baudrate of 900000 has been tested and appears to work
+satisfactorily. You should experiment with this value.
+
+Slice of PI/O on Raspberry Pi
+-----------------------------
+
+ RPI version	I2C device	Default MCP Address
+ -----------	----------	-------------------
+ 1		/dev/i2c-0	0x20
+ 2		/dev/i2c-1	0x20
+
+The slice of PI/O may be configured in 3V3 or 5V modes of operation
+by a jumper.
+
+Power may be taken from the board on PWR and GND if a suitable 4-pin
+header is connected.
+
+Breadboard connections for LVP programming with VPP at 3V3 or 5V
+----------------------------------------------------------------
+
+ SLICE OF PI/O                     PICMicro
+ =============                     ========
+
+ PWR-------------------------------VDD
+
+ GND-------------------------------VSS
+
+ A0--------------------------------VPP
+
+ A1--------------------------------PGC
+
+ A2--------------1000R--------+----PGD
+                              |
+ A3---------------------------+
+
+ A4--------------------------------PGM (1)
+
+(1) Not used by all LVP compatible devices.

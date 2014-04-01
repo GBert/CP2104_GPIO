@@ -1,0 +1,95 @@
+-------------------------------------------------------------------------------
+
+ Copyright (C) 2005-2014 Darron Broad
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name `Darron Broad' nor the names of any contributors
+    may be used to endorse or promote products derived from this
+    software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+KNOWN UNSUPPORTED DEVICES (PDIP/SPDIP ONLY)
+===========================================
+
+TO ACQUIRE (C=CPC, F=FARNELL, M=MICROCHP)
+-----------------------------------------
+
+BASELINE
+	N/A
+MIDRANGE
+	N/A
+ENHANCED
+	PIC16F18313/23/24/25/44/45	Future Product
+	PIC16LF1554/9			Future Product		Related to the PIC12LF1552 
+	PIC16F1614/5/8/9		Future Product		Related to the PIC12F1612
+	PIC16F1717/8/9			Future Product		Related to the PIC16F1713/6
+PIC18
+	N/A
+PIC24
+	N/A
+dsPIC
+	dsPIC33EV256GM002		Future Product		5V
+PIC32
+	N/A
+
+ON ORDER
+--------
+
+BASELINE
+	N/A
+MIDRANGE
+	N/A
+ENHANCED
+	N/A
+PIC18
+	N/A
+PIC24
+	N/A
+dsPIC
+	N/A
+PIC32
+	N/A
+
+AVAILABLE
+---------
+
+BASELINE
+	N/A
+MIDRANGE
+	N/A
+ENHANCED
+	PIC12LF1572
+	PIC16LF1716
+PIC18
+	N/A
+PIC24
+	N/A
+dsPIC
+	N/A
+PIC32
+	PIC32MX150F128B 
+	PIC32MX250F128B
