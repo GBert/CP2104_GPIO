@@ -4,7 +4,7 @@ This git contains module code to use the GPIOs on cp2104 adapter with Linux.
 
 ![alt text](https://raw.githubusercontent.com/GBert/CP2104_GPIO/master/images/cp2104.jpg "cp2104")
 
-It also contains code to programm a PIC MCU.
+It also contains code to programm PIC MCUs.
 
 Howto use the kernel module
 ---------------------------
