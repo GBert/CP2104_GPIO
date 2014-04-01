@@ -1,16 +1,38 @@
 Using GPIOs on CP2104 adapter
 =============================
+This git contains module code to use the GPIOs on cp2104 adapter with Linux.
+It also contains code to programm a PIC MCU.
 
-This git contains module code to use the GPIOs on cp2104 adapter
-with Linux.
-It also contains code to programm a PIC MCU. The programming
-is slow but enough to flash a bootloader. 
+Howto use the kernel module
+---------------------------
+```
+git clone https://github/GBert/https://github.com/GBert/CP2104_GPIO
+cd CP2104_GPIO
+# decide which module to use
+uname -a
+# for kernels <= 3.6
+cp cp2104_3.6.c cp2104.c
+# for kernel > 3.6
+cp cp2104_3.10.c cp2104.c
+make
+# remove existing module and install modified module
+sudo rmmod cp210x
+sudo insmod ./cp2104.ko
+```
 
 Using as PIC programmer
 -----------------------
+The original code from http://dev.kewl.org/k8048/Doc/ is able to programm a wide range of PICs 
+in Low Voltage Programming (aka LVP) mode. There is an inplementation using cheap USB to serial
+converters like the CP2102 based boards. But you run ouf of output pins if you have PICs with
+PGM pin. I've modified the original code to use the GPIOs on CP2104 boards which are able to do it.
 
-This is an adaption of the http://dev.kewl.org/k8048/Doc/ software from Darron Broad.
-The GPIOs are open-drain so pull-ups are needed.
+BTW: The slow programming speed is caused by the USB interface. The k8048 code itself is very
+fast if you use GPIOs on boards like RPi or OpenWrt router.
+
+Interfacing to PIC MCU
+----------------------
+The GPIOs are normally open-drain so pull-ups are needed.
 
 ``` 
 Breadboard connections for LVP programming with VPP at 3V3
