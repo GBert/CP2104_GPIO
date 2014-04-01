@@ -9,7 +9,7 @@ It also contains code to programm PIC MCUs.
 Howto use the kernel module
 ---------------------------
 ```
-git clone https://github/GBert/https://github.com/GBert/CP2104_GPIO
+git clone https://github.com/GBert/CP2104_GPIO
 cd CP2104_GPIO
 # decide which module to use
 uname -a
