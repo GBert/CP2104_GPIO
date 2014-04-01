@@ -31,10 +31,7 @@
  */
 
 #include "k8048.h"
-#ifdef CP2104
-#define IOCTL_GPIOGET 0x8000
-#define IOCTL_GPIOSET 0x8001
-#endif
+
 /*
  * File descriptor
  */

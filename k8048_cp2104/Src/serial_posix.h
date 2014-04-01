@@ -40,6 +40,10 @@
 #include <errno.h>   /* Error number definitions */
 #include <termios.h> /* POSIX terminal control definitions */
 
+
+/* CP2104 IOCTLs */
+#define IOCTL_GPIOGET	0x8000
+#define IOCTL_GPIOSET	0x8001
 /* CP2104 GPIO */
 #define GPIO_0_ON       0x00010001
 #define GPIO_0_OFF      0x00000001
