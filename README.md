@@ -9,11 +9,12 @@ is slow but enough to flash a bootloader.
 Using as PIC programmer
 -----------------------
 
-This is an adaption of the k8048 software from Darron Broad.
+This is an adaption of the http://dev.kewl.org/k8048/Doc/ k8048 software from Darron Broad.
 
-<pre><code>
+
+``` 
 Breadboard connections for LVP programming with VPP at 3V3
-\----------------------------------------------------------
+----------------------------------------------------------
  CP2104                            PICMicro
  ======                            ========
  3V3-------------------------------VDD----------+
@@ -28,4 +29,4 @@ Breadboard connections for LVP programming with VPP at 3V3
                                                 |
  GPIO 0----------------------------PGM---4.7K---+
 (1) Not used by all LVP compatible devices.
-</pre></code>
+```
