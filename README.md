@@ -14,10 +14,8 @@ This is an adaption of the k8048 software from Darron Broad.
 <pre><code>
 Breadboard connections for LVP programming with VPP at 3V3
 \----------------------------------------------------------
-
  CP2104                            PICMicro
  ======                            ========
-
  3V3-------------------------------VDD----------+
                                                 |
  GND-------------------------------VSS          |
@@ -29,6 +27,5 @@ Breadboard connections for LVP programming with VPP at 3V3
  GPIO 3----------------------------PGD---4.7K---+
                                                 |
  GPIO 0----------------------------PGM---4.7K---+
-
 (1) Not used by all LVP compatible devices.
 </pre></code>
