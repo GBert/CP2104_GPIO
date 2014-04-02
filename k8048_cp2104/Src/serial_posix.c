@@ -159,11 +159,11 @@ set_rts(int rts)
 	unsigned gpio;
 	if (rts) {
 		gpio = GPIO_2_ON;
-		ioctl(serial_port, IOCTL_GPIOSET, &gpio); /* +ve */
+		ioctl(serial_port, IOCTL_GPIOSET, &gpio); /* -ve */
 	}
 	else {
 		gpio = GPIO_2_OFF;
-		ioctl(serial_port, IOCTL_GPIOSET, &gpio); /* -ve */
+		ioctl(serial_port, IOCTL_GPIOSET, &gpio); /* +ve */
 	}
 #else
 	int status;
@@ -188,11 +188,11 @@ set_tx(int tx)
 	unsigned gpio;
         if (tx) {
 		gpio = GPIO_1_ON;
-                ioctl(serial_port, IOCTL_GPIOSET, &gpio); /* +ve */
+                ioctl(serial_port, IOCTL_GPIOSET, &gpio); /* -ve */
 	}
         else {
 		gpio = GPIO_1_OFF;
-                ioctl(serial_port, IOCTL_GPIOSET, &gpio); /* -ve */
+                ioctl(serial_port, IOCTL_GPIOSET, &gpio); /* +ve */
 	}
 #else
 	if (tx)
@@ -214,11 +214,11 @@ set_gpio0(int gpio0)
 	
         if (gpio0) {
 		gpio = GPIO_0_ON;
-                ioctl(serial_port, IOCTL_GPIOSET, &gpio); /* +ve */
+                ioctl(serial_port, IOCTL_GPIOSET, &gpio); /* -ve */
 	}
         else {
 		gpio = GPIO_0_OFF;
-                ioctl(serial_port, IOCTL_GPIOSET, &gpio); /* -ve */
+                ioctl(serial_port, IOCTL_GPIOSET, &gpio); /* +ve */
 	}
 }
 #endif
