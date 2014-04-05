@@ -52,8 +52,10 @@ Breadboard connections for LVP programming with VPP at 3V3
                                                 |
  GPIO 3----------------------------PGD---4.7K---+
                                                 |
- GPIO 0----------------------------PGM---4.7K---+
+ GPIO 0----------------------------PGM---4.7K---+ (1)
+
 (1) Not used by all LVP compatible devices.
+(2) PIC18F14K50 needs VUSB connected to VDD
 ```
 ### Using
 
@@ -88,3 +90,14 @@ cp dotconf/cp2104_gpio ~/.k8048
 [F00000] [DATA]	       0100 BYTES
 k16 id  0,06s user 0,00s system 1% cpu 5,129 total
 ```
+#### "Speed" Test
+```
+% time k16 p USBtin_bootloader_v1.0.hex
+Total: 3980
+k16 p USBtin_bootloader_v1.0.hex  0,68s user 3,90s system 0% cpu 7:47,22 total
+
+% time k16 v USBtin_bootloader_v1.0.hex
+Total: 3966 Pass: 3966 Fail: 0
+k16 v USBtin_bootloader_v1.0.hex  1,10s user 5,71s system 1% cpu 11:13,08 total
+```
+
