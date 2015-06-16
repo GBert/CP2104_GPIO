@@ -765,13 +765,43 @@ static void cp210x_change_speed(struct tty_struct *tty,
 {
 	u32 baud;
 
-	baud = tty->termios.c_ospeed;
+	/* TODO */
+
+	/*
+	 * The logic involved in setting the baudrate can be cleanly split into
+	 * 3 steps.
+	 * 1. Standard baud rates are set in tty->termios->c_cflag
+	 * 2. If these are not enough, you can set any speed using alt_speed as
+	 * follows:
+	 *    - set tty->termios->c_cflag speed to B38400
+	 *    - set your real speed in tty->alt_speed; it gets ignored when
+	 *      alt_speed==0, (or)
+	 *    - call TIOCSSERIAL ioctl with (struct serial_struct) set as
+	 *      follows:
+	 *      flags & ASYNC_SPD_MASK == ASYNC_SPD_[HI, VHI, SHI, WARP],
+	 *      this just sets alt_speed to (HI: 57600, VHI: 115200,
+	 *      SHI: 230400, WARP: 460800)
+	 * ** Steps 1, 2 are done courtesy of tty_get_baud_rate
+	 * 3. You can also set baud rate by setting custom divisor as follows
+	 *    - set tty->termios->c_cflag speed to B38400
+	 *    - call TIOCSSERIAL ioctl with (struct serial_struct) set as
+	 *      follows:
+	 *      o flags & ASYNC_SPD_MASK == ASYNC_SPD_CUST
+	 *      o custom_divisor set to baud_base / your_new_baudrate
+	 * ** Step 3 is done courtesy of code borrowed from serial.c
+	 *    I should really spend some time and separate + move this common
+	 *    code to serial.c, it is replicated in nearly every serial driver
+	 *    you see.
+	 */
 
 	/* This maps the requested rate to a rate valid on cp2102 or cp2103,
 	 * or to an arbitrary rate in [1M,2M].
 	 *
 	 * NOTE: B0 is not implemented.
 	 */
+
+	baud = tty->termios.c_ospeed;
+
 	baud = cp210x_quantise_baudrate(baud);
 
 	dev_dbg(&port->dev, "%s - setting baud rate to %u\n", __func__, baud);
